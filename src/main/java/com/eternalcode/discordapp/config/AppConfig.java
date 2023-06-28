@@ -30,6 +30,9 @@ public class AppConfig implements CdnConfig {
     @Description("# Sentry DSN")
     public String sentryDsn = System.getenv("OFFICER_SENTRY_DSN") != null ? System.getenv("OFFICER_SENTRY_DSN") : "PASTE_SENTRY_DSN_HERE";
 
+    @Description("# Vacation role for team members")
+    public long vacationRoleId = System.getenv("OFFICER_VACATION_ROLE") != null ? Long.parseLong(System.getenv("OFFICER_VACATION_ROLE")) : 1123609129651556402L;
+
     @Description("# The settings of embeds")
     public EmbedSettings embedSettings = new EmbedSettings();
 
@@ -100,7 +103,7 @@ public class AppConfig implements CdnConfig {
 
 
         public List<GitHubReviewUser> reviewers = new ArrayList<>(Collections.singletonList(
-                new GitHubReviewUser(852920601969950760L, "vluckyyy")
+                new GitHubReviewUser(852920601969950760L, "vLuckyyy", true)
         ));
     }
 }

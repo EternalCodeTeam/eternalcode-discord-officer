@@ -7,10 +7,12 @@ public class GitHubReviewUser {
 
     private Long discordId;
     private String githubUsername;
+    private boolean isRecivingDMs;
 
-    public GitHubReviewUser(Long id, String username) {
+    public GitHubReviewUser(Long id, String username, boolean isRecivingDMs) {
         this.discordId = id;
         this.githubUsername = username;
+        this.isRecivingDMs = isRecivingDMs;
     }
 
     public GitHubReviewUser() {}
@@ -23,4 +25,11 @@ public class GitHubReviewUser {
         return this.githubUsername;
     }
 
+    public boolean isRecivingDMs() {
+        return this.isRecivingDMs;
+    }
+
+    public void setRecivingDMs(boolean isRecivingDMs) {
+        this.isRecivingDMs = isRecivingDMs;
+    }
 }

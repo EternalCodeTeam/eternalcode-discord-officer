@@ -2,6 +2,7 @@ package com.eternalcode.discordapp.review.command;
 
 import com.eternalcode.discordapp.review.GitHubReviewService;
 import com.eternalcode.discordapp.review.command.child.AddChild;
+import com.eternalcode.discordapp.review.command.child.ChangeDmChild;
 import com.eternalcode.discordapp.review.command.child.ListChild;
 import com.eternalcode.discordapp.review.command.child.RemoveChild;
 import com.eternalcode.discordapp.review.command.child.RequestChild;
@@ -20,7 +21,8 @@ public class GitHubReviewCommand extends SlashCommand {
                 new AddChild(gitHubReviewService),
                 new ListChild(gitHubReviewService),
                 new RemoveChild(gitHubReviewService),
-                new RequestChild(gitHubReviewService)
+                new RequestChild(gitHubReviewService),
+                new ChangeDmChild(gitHubReviewService)
         };
     }
 

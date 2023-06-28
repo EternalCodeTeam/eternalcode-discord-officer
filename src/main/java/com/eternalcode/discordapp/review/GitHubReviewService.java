@@ -4,6 +4,7 @@ import com.eternalcode.discordapp.config.AppConfig;
 import com.eternalcode.discordapp.config.ConfigManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -78,6 +79,8 @@ public class GitHubReviewService {
             return;
         }
 
+        Role role = jda.getRoleById(this.discordAppConfig.vacationRoleId);
+
         StringBuilder reviewersMention = new StringBuilder();
         for (String reviewer : assignedReviewers) {
             GitHubReviewUser gitHubReviewUser = this.getReviewUserByUsername(reviewer);
@@ -90,6 +93,10 @@ public class GitHubReviewService {
                 continue;
             }
 
+            if (!gitHubReviewUser.isRecivingDMs()) {
+                continue;
+            }
+
             if (this.mentionRepository.isMentioned(pullRequest, discordId)) {
                 continue;
             }
@@ -97,6 +104,18 @@ public class GitHubReviewService {
             User user = jda.getUserById(discordId);
             if (user == null) {
                 continue;
+            }
+
+            if (role != null) {
+                boolean hasRole = jda.getGuildById(this.discordAppConfig.guildId)
+                    .getMember(user)
+                    .getRoles()
+                    .stream()
+                    .anyMatch(userRole -> userRole.equals(role));
+
+                if (hasRole) {
+                    continue;
+                }
             }
 
             user.openPrivateChannel().queue(privateChannel -> {
@@ -223,6 +242,13 @@ public class GitHubReviewService {
     public GitHubReviewUser getReviewUserByUsername(String githubUsername) {
         return this.discordAppConfig.reviewSystem.reviewers.stream()
             .filter(user -> user.githubUsername().equals(githubUsername))
+            .findFirst()
+            .orElse(null);
+    }
+
+    public GitHubReviewUser getReviewUserByDiscordId(Long discordId) {
+        return this.discordAppConfig.reviewSystem.reviewers.stream()
+            .filter(user -> user.discordId().equals(discordId))
             .findFirst()
             .orElse(null);
     }

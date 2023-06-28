@@ -24,7 +24,10 @@ public class AddChild extends SlashCommand {
             new OptionData(OptionType.USER, "user", "Add user to reviewers list")
                 .setRequired(true),
             new OptionData(OptionType.STRING, "github-username", "GitHub username of the user")
+                .setRequired(true),
+            new OptionData(OptionType.BOOLEAN, "reciving-dms", "Is user reciving DMs from the bot")
                 .setRequired(true)
+                .setAutoComplete(false)
         );
 
         this.gitHubReviewService = gitHubReviewService;
@@ -35,8 +38,9 @@ public class AddChild extends SlashCommand {
         try {
             Long discordUsername = event.getOption("user").getAsUser().getIdLong();
             String githubUsername = event.getOption("github-username").getAsString();
+            boolean isRecivingDMs = event.getOption("reciving-dms").getAsBoolean();
 
-            GitHubReviewUser gitHubReviewUser = new GitHubReviewUser(discordUsername, githubUsername);
+            GitHubReviewUser gitHubReviewUser = new GitHubReviewUser(discordUsername, githubUsername, isRecivingDMs);
 
             boolean addUserToSystem = this.gitHubReviewService.addUserToSystem(gitHubReviewUser);
 
