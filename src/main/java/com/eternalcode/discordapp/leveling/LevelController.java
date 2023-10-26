@@ -27,53 +27,63 @@ public class LevelController implements Observer<ExperienceChangeEvent> {
     public void update(ExperienceChangeEvent event) {
         Experience experience = event.experience();
         long userId = experience.getUserId();
-
         double experiencePoints = experience.getPoints();
-
         double pointsNeededForOneLevel = this.levelConfig.points;
 
-        this.levelService.find(userId).thenApply(userLevel -> {
-            int currentLevel = userLevel.getCurrentLevel();
+        this.levelService.find(userId).thenApply(level -> this.updateLevels(level, experiencePoints, pointsNeededForOneLevel, event));
+    }
 
-            int pointsNeededForNextLevel = LevelUtil.calculatePointsForNextLevel(currentLevel, pointsNeededForOneLevel);
+    private Level updateLevels(Level level, double experiencePoints,
+                               double pointsNeededForOneLevel, ExperienceChangeEvent event) {
 
-            if (experiencePoints <= pointsNeededForNextLevel) {
-                return null;
+        int currentLevel = level.getCurrentLevel();
+
+        int pointsNeededForNextLevel = LevelUtil.calculatePointsForNextLevel(currentLevel, pointsNeededForOneLevel);
+
+        if (experiencePoints <= pointsNeededForNextLevel) {
+            return null;
+        }
+
+        int newLevel = currentLevel + 1;
+        this.updateCurrentLevel(level, newLevel);
+
+        User user = this.jda.getUserById(level.getId());
+        if (user == null) {
+            return null;
+        }
+
+        String messageContent = this.prepareMessageContent(user, newLevel);
+        this.sendLevelUpMessage(messageContent, event);
+
+        return level;
+    }
+
+    private void updateCurrentLevel(Level level, int newLevel) {
+        level.setCurrentLevel(newLevel);
+        this.levelService.saveLevel(level);
+    }
+
+    private String prepareMessageContent(User user, int newLevel) {
+        return new Formatter()
+            .register("{user}", user.getAsMention())
+            .register("{level}", String.valueOf(newLevel))
+            .format(this.levelConfig.message.description);
+    }
+
+    private void sendLevelUpMessage(String messageContent, ExperienceChangeEvent event) {
+        try {
+            LongSupplier channelId = event.channelId();
+            MessageChannel channel = this.getChannelById(channelId);
+
+            if (channel == null) {
+                return;
             }
 
-            int newLevel = currentLevel + 1;
+            channel.sendMessage(messageContent).queue(message -> message.delete().queueAfter(5, TimeUnit.SECONDS));
+        }
+        catch (Exception ignored) {
 
-            userLevel.setCurrentLevel(newLevel);
-            this.levelService.saveLevel(userLevel);
-
-            User user = this.jda.getUserById(userId);
-            if (user == null) {
-                return null;
-            }
-
-            String messageContent = new Formatter()
-                .register("{user}", user.getAsMention())
-                .register("{level}", String.valueOf(newLevel))
-                .format(this.levelConfig.message.description);
-
-
-            try {
-                LongSupplier channelId = event.channelId();
-
-                MessageChannel channel = this.getChannelById(channelId);
-
-                if (channel == null) {
-                    return null;
-                }
-
-                channel.sendMessage(messageContent).queue(message -> message.delete().queueAfter(5, TimeUnit.SECONDS));
-            }
-            catch (Exception ignored) {
-
-            }
-
-            return userLevel;
-        });
+        }
     }
 
     private MessageChannel getChannelById(LongSupplier channelId) {
