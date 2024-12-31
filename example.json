@@ -1,0 +1,71 @@
+{
+    "className": "GitRepository",
+    "constructors": [
+        {
+            "parameters": ["String owner", "String name"]
+        }
+    ],
+    "fields": [
+        {
+            "name": "owner",
+            "type": "String",
+            "description": "The owner of the repository.",
+            "modifiers": ["final"],
+            "annotations": ["@NotNull"]
+        },
+        {
+            "name": "name",
+            "type": "String",
+            "description": "The name of the repository.",
+            "modifiers": ["final"],
+            "annotations": ["@NotNull"]
+        },
+        {
+            "name": "FULL_NAME_FORMAT",
+            "type": "String",
+            "description": "A format string for combining the owner and repository name.",
+            "modifiers": ["static", "final"],
+            "annotations": []
+        }
+    ],
+    "methods": [
+        {
+            "name": "getOwner",
+            "returnType": "String",
+            "description": "Returns the owner of the repository.",
+            "annotations": "@NotNull"
+        },
+        {
+            "name": "getName",
+            "returnType": "String",
+            "description": "Returns the name of the repository.",
+            "annotations": "@NotNull"
+        },
+        {
+            "name": "getFullName",
+            "returnType": "String",
+            "description": "Returns the full name of the repository in the format 'owner/name'.",
+            "annotations": "@NotNull"
+        },
+        {
+            "name": "equals",
+            "returnType": "boolean",
+            "parameters": ["Object object"],
+            "description": "Compares this repository to another object for equality.",
+            "annotations": []
+        },
+        {
+            "name": "hashCode",
+            "returnType": "int",
+            "description": "Generates a hash code for this repository.",
+            "annotations": []
+        },
+        {
+            "name": "of",
+            "returnType": "GitRepository",
+            "parameters": ["@NotNull String owner", "@NotNull String name"],
+            "description": "Factory method to create a new instance of GitRepository.",
+            "annotations": []
+        }
+    ]
+}
